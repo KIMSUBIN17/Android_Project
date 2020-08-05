@@ -1,5 +1,7 @@
 package com.example.newsapp;
 
+import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +11,13 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import java.util.List;
+
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private String[] mDataset;
+    private List<NewsData> mDataset;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -21,7 +28,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         public TextView TextView_title;
         public TextView TextView_content;
-        public ImageView ImageView_title;
+        public SimpleDraweeView ImageView_title;
         public MyViewHolder(View v) {
             super(v);
             TextView_title = v.findViewById(R.id.TextView_title);
@@ -37,8 +44,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     // 각 줄마다 보여줄 값을 들고 있는 원본 데이터 mDataset 변수(초기 데이터가 string자료형, 다른 자료형으로도 변경가능_
     //값을 꺼내서 텍스트뷰. 이미지뷰에 각각 표시하게됨
     //액티비기ㅏ 원본 데이터를 어댑터로 넘겨주고 > 어댑터는 그걸로 작업
-    public MyAdapter(String[] myDataset) {
+    public MyAdapter(List<NewsData> myDataset, Context context) {
         mDataset = myDataset;
+        Fresco.initialize(context);
     }
 
     // Create new views (invoked by the layout manager)
@@ -60,8 +68,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public void onBindViewHolder(MyViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.TextView_title.setText(mDataset[position]);
         // ViewHolder가 반복되면서 onBind~함수에서 값을 셋팅
+        // position에 해당하는 데이터를 가져오는 것
+        // List에 순서대로 add하여 넣었기 때문에 get으로 하면 해당 순번의 뉴스 데이터를 꺼낼 수 있음
+        NewsData news = mDataset.get(position);
+
+        holder.TextView_title.setText(news.getTitle());
+        holder.TextView_content.setText(news.getContent());
+        //이미지 주소 통해 이미지 가져옴(fresco 사용)
+
+        Uri uri = Uri.parse(news.getUrlToImage());
+
+        holder.ImageView_title.setImageURI(uri);
+
 
     }
 
@@ -69,6 +88,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     //ViewHolder가 원본 데이터의 크기(번지수 길이)만큼 반복됨
     @Override
     public int getItemCount() {
-        return mDataset.length;
+
+        return mDataset == null ? 0 : mDataset.size();
     }
 }
+
+
+//fresco 사용법
+//1. init
+//2. 전용뷰 xml
+//3. 이미지 로딩딩
