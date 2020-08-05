@@ -74,9 +74,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         NewsData news = mDataset.get(position);
 
         holder.TextView_title.setText(news.getTitle());
-        holder.TextView_content.setText(news.getContent());
-        //이미지 주소 통해 이미지 가져옴(fresco 사용)
 
+        String content = news.getContent();
+        if(content != null && content.length() > 0) {
+            holder.TextView_content.setText(content);
+        }
+        else{
+            holder.TextView_content.setText("-");
+        }
+
+        //이미지 주소 통해 이미지 가져옴(fresco 사용)
         Uri uri = Uri.parse(news.getUrlToImage());
 
         holder.ImageView_title.setImageURI(uri);
